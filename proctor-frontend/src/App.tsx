@@ -26,6 +26,7 @@ function App() {
 
   const [faceCount, setFaceCount] = useState(0)
   const [status, setStatus] = useState('Initializing...')
+  console.log(status);
   const [events, setEvents] = useState<EventItem[]>([])
   const pendingToSendRef = useRef<EventItem[]>([])
   const sessionIdRef = useRef<string | null>(null)
@@ -172,6 +173,7 @@ function App() {
                   ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
                   let currStatus = 'No face'
+                  console.log(currStatus);
                   if (detections.length > 0) {
                     lastFaceSeenAtRef.current = Date.now()
                     noFaceLoggedRef.current = false
