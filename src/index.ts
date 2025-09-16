@@ -1,0 +1,1 @@
+import express from 'express';\nimport cors from 'cors';\nimport morgan from 'morgan';\n\nconst app = express();\napp.use(cors());\napp.use(express.json());\napp.use(morgan('dev'));\n\napp.get('/health', (_req, res) => {\n  res.json({ ok: true });\n});\n\nconst port = process.env.PORT || 4000;\napp.listen(port, () => {\n  console.log(API listening on port );\n});\n

@@ -1,0 +1,12 @@
+# Node modules
+node_modules/
+# Build/dist folders
+dist/
+build/
+# Logs
+*.log
+# OS files
+.DS_Store
+Thumbs.db
+# Vite cache
+.vite/
