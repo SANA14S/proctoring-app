@@ -77,19 +77,27 @@ app.get('/api/session/:id/report.pdf', async (req, res) => {
   const durationMin = Math.max(0, Math.round((Date.now() - s.createdAt) / 60000));
 
   const pdf = await PDFDocument.create();
-  const page = pdf.addPage([595.28, 841.89]); // A4 portrait
-  const font = await pdf.embedFont(StandardFonts.Helvetica);
+const page = pdf.addPage([595.28, 841.89]); // A4 portrait
+const font = await pdf.embedFont(StandardFonts.Helvetica);
 
-  const drawText = (text: string, x: number, y: number, size = 12) => {
-    page.drawText(text, { x, y, size, font, color: rgb(0,0,0) });
-  };
+// 👇 Add sanitize function here
+const sanitize = (text: string) =>
+  text.replace(/≈/g, "~"); // or "approx."
 
-  let y = 800;
-  drawText('Proctoring Report', 50, y, 20); y -= 30;
-  drawText(`Session ID: ${id}`, 50, y); y -= 16;
-  drawText(`Candidate: ${s.candidateName || 'N/A'}`, 50, y); y -= 16;
-  drawText(`Duration: ${durationMin} min`, 50, y); y -= 16;
-  drawText(`Integrity Score: ${score}/100`, 50, y); y -= 24;
+// 👇 Update drawText to use sanitize
+const drawText = (text: string, x: number, y: number, size = 12) => {
+  page.drawText(sanitize(text), { x, y, size, font, color: rgb(0,0,0) });
+};
+
+let y = 800;
+drawText("Proctoring Report", 50, y, 20); y -= 30;
+drawText(`Session ID: ${id}`, 50, y); y -= 16;
+drawText(`Candidate: ${s.candidateName || "N/A"}`, 50, y); y -= 16;
+drawText(`Duration: ${durationMin} min`, 50, y); y -= 16;
+drawText(`Integrity Score: ${score}/100`, 50, y); y -= 24;
+
+// ... rest of your code stays same
+
 
   drawText('Summary', 50, y, 14); y -= 18;
   drawText(`Face-found events: ${(counts['face-found']||0)}`, 60, y); y -= 14;

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import { Camera } from '@mediapipe/camera_utils/camera_utils'
+import * as camUtils from "@mediapipe/camera_utils/camera_utils";
+
+
 
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
 import * as tf from '@tensorflow/tfjs'
@@ -19,7 +21,7 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordedChunksRef = useRef<Blob[]>([])
-  const cameraRef = useRef<Camera | null>(null)
+ const cameraRef = useRef<any>(null) 
 
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [isRecording, setIsRecording] = useState(false)
@@ -129,6 +131,8 @@ function App() {
         blazeModelRef.current = await blazeface.load({ maxFaces: 2 })
         if (objectsEnabled && !cocoModelRef.current) {
           cocoModelRef.current = await cocoSsd.load({ base: 'lite_mobilenet_v2' })
+          console.log("✅ Object Detection model loaded");
+
         }
 
         odCanvasRef.current = document.createElement('canvas')
@@ -136,7 +140,7 @@ function App() {
         odCanvasRef.current.height = performanceMode ? 192 : 240
 
         if (videoRef.current) {
-          const cam = new Camera(videoRef.current, {
+          const cam = new camUtils.Camera(videoRef.current, {
             onFrame: async () => {
               if (!videoRef.current) return
 
@@ -276,36 +280,39 @@ if (det.topLeft && det.bottomRight) {
                 }
               }
 
+
               // Object detection if enabled and not recording
+              
+
               if (!isRecording && objectsEnabled && cocoModelRef.current && odCanvasRef.current) {
-                const now = Date.now()
-                const interval = performanceMode ? 2500 : 1200
-                if (now - lastObjectEventAtRef.current > interval) {
-                  lastObjectEventAtRef.current = now
-                  const ctx = odCanvasRef.current.getContext('2d', { willReadFrequently: true })!
-                  ctx.drawImage(videoRef.current, 0, 0, odCanvasRef.current.width, odCanvasRef.current.height)
-                  const preds = await cocoModelRef.current.detect(odCanvasRef.current)
-                  const interesting = preds.filter((p) =>
-                    ['cell phone', 'book', 'laptop', 'keyboard', 'mouse'].includes(p.class)
-                    && p.score > 0.8
-                  )
-                  if (interesting.length > 0) {
-                    const labels = Array.from(new Set(interesting.map((p) => p.class))).join(', ')
-                    setEvents((prev) => {
-                      const last = prev[prev.length - 1]
-                      if (!last || last.type !== 'object-detected' || last.detail !== labels) {
-                        return [
-                          ...prev,
-                          { time: new Date().toLocaleTimeString(), type: 'object-detected', detail: labels },
-                        ]
-                      }
-                      return prev
-                    })
-                    pendingToSendRef.current.push({ time: new Date().toISOString(), type: 'object-detected', detail: labels })
-                    toast.warning(`Object detected: ${labels}`)
-                  }
-                }
-              }
+  const now = Date.now()
+  const interval = performanceMode ? 3500 : 1200
+  if (now - lastObjectEventAtRef.current > interval) {
+    lastObjectEventAtRef.current = now
+
+    const ctx = odCanvasRef.current.getContext('2d', { willReadFrequently: true })!
+    ctx.drawImage(videoRef.current, 0, 0, odCanvasRef.current.width, odCanvasRef.current.height)
+
+    const preds = await cocoModelRef.current.detect(odCanvasRef.current)
+    const interesting = preds.filter(p =>
+      ['cell phone', 'book', 'laptop', 'keyboard', 'mouse', 'bottle', 'charger', 'camera', 'earphones'].includes(p.class)
+      && p.score > 0.8
+    )
+
+    if (interesting.length > 0) {
+      const labels = Array.from(new Set(interesting.map(p => p.class))).join(', ')
+      setEvents(prev => {
+        const last = prev[prev.length - 1]
+        if (!last || last.type !== 'object-detected' || last.detail !== labels) {
+          return [...prev, { time: new Date().toLocaleTimeString(), type: 'object-detected', detail: labels }]
+        }
+        return prev
+      })
+      pendingToSendRef.current.push({ time: new Date().toISOString(), type: 'object-detected', detail: labels })
+    }
+  }
+}
+
             },
           })
           cameraRef.current = cam
