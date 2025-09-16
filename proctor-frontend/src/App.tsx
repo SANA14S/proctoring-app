@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import { Camera } from '@mediapipe/camera_utils'
+import { Camera } from '@mediapipe/camera_utils/camera_utils'
+
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
 import * as tf from '@tensorflow/tfjs'
 import * as blazeface from '@tensorflow-models/blazeface'
