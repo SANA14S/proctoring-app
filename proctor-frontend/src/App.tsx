@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import * as camUtils from "@mediapipe/camera_utils/camera_utils";
-
-
-
+import * as camUtils from "@mediapipe/camera_utils";
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
 import * as tf from '@tensorflow/tfjs'
 import * as blazeface from '@tensorflow-models/blazeface'
@@ -295,7 +292,7 @@ if (det.topLeft && det.bottomRight) {
 
     const preds = await cocoModelRef.current.detect(odCanvasRef.current)
     const interesting = preds.filter(p =>
-      ['cell phone', 'book', 'laptop', 'keyboard', 'mouse', 'bottle', 'charger', 'camera', 'earphones'].includes(p.class)
+      ['cell phone', 'book', 'laptop', 'keyboard', 'mouse', 'bottle', 'charger', 'camera'].includes(p.class)
       && p.score > 0.8
     )
 

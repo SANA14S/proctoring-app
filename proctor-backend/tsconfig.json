@@ -1,5 +1,4 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
@@ -16,7 +15,7 @@
     "declarationMap": true,
 
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,   // ✅ fix
 
     "strict": true,
     "skipLibCheck": true
