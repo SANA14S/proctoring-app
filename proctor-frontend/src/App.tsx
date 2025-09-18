@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import * as camUtils from "@mediapipe/camera_utils";
 import * as cocoSsd from '@tensorflow-models/coco-ssd'
 import * as tf from '@tensorflow/tfjs'
 import * as blazeface from '@tensorflow-models/blazeface'
 import { Toaster, toast } from 'sonner'
+const Camera = (window as any).Camera;
 
 
 type EventItem = { time: string; type: string; detail?: string }
@@ -137,7 +137,7 @@ function App() {
         odCanvasRef.current.height = performanceMode ? 192 : 240
 
         if (videoRef.current) {
-          const cam = new camUtils.Camera(videoRef.current, {
+          const cam = new Camera(videoRef.current, {
             onFrame: async () => {
               if (!videoRef.current) return
 
